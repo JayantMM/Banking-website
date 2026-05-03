@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mini Statement</title>
+</head>
+
+<body>
+
+<h2>Transaction History</h2>
+
+<table border="1" id="table">
+<tr>
+<th>Sender</th>
+<th>Receiver</th>
+<th>Amount</th>
+<th>Date</th>
+</tr>
+</table>
+
+<script>
+
+fetch("/statement")
+.then(res=>res.json())
+.then(data=>{
+
+let table=document.getElementById("table");
+
+data.forEach(t=>{
+
+table.innerHTML += `
+<tr>
+<td>${t.sender_email}</td>
+<td>${t.receiver_email}</td>
+<td>${t.amount}</td>
+<td>${t.date}</td>
+</tr>
+`;
+
+});
+
+});
+
+</script>
+
+</body>
+</html>

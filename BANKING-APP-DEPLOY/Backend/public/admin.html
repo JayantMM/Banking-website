@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Dashboard</title>
+
+<style>
+body{
+font-family:Arial;
+background:#eaf2f8;
+margin:0;
+}
+
+.top{
+background:#1f6feb;
+color:white;
+padding:20px;
+font-size:35px;
+text-align:center;
+font-weight:bold;
+}
+
+.box{
+width:90%;
+margin:30px auto;
+background:white;
+padding:25px;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+}
+
+th,td{
+padding:12px;
+border:1px solid #ccc;
+text-align:center;
+}
+
+th{
+background:#1f6feb;
+color:white;
+}
+
+button{
+padding:8px 14px;
+background:red;
+color:white;
+border:none;
+cursor:pointer;
+border-radius:5px;
+}
+
+.logout{
+background:#333;
+padding:10px 20px;
+}
+
+.center{
+text-align:center;
+margin-top:25px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="top">🔐 ADMIN DASHBOARD</div>
+
+<div class="box">
+
+<h2>Total Users: <span id="count">0</span></h2>
+
+<table>
+<thead>
+<tr>
+<th>No</th>
+<th>Name</th>
+<th>Email</th>
+<th>Username</th>
+<th>Gender</th>
+<th>Delete</th>
+</tr>
+</thead>
+
+<tbody id="usersTable">
+<tr>
+<td colspan="6">Loading...</td>
+</tr>
+</tbody>
+
+</table>
+
+<div class="center">
+<button class="logout" onclick="logout()">Logout</button>
+</div>
+
+</div>
+
+<script>
+
+function loadUsers(){
+
+fetch("/users")
+.then(res=>res.json())
+.then(users=>{
+
+document.getElementById("count").innerHTML=users.length;
+
+let output="";
+
+if(users.length===0){
+
+output=`
+<tr>
+<td colspan="6">No Users Found</td>
+</tr>
+`;
+
+}else{
+
+users.forEach((u,index)=>{
+
+output+=`
+<tr>
+<td>${index+1}</td>
+<td>${u.name || ""}</td>
+<td>${u.email || ""}</td>
+<td>${u.username || ""}</td>
+<td>${u.gender || ""}</td>
+<td>
+<button onclick="deleteUser(${u.id})">Delete</button>
+</td>
+</tr>
+`;
+
+});
+
+}
+
+document.getElementById("usersTable").innerHTML=output;
+
+})
+.catch(()=>{
+
+document.getElementById("usersTable").innerHTML=`
+<tr>
+<td colspan="6">Server Not Running</td>
+</tr>
+`;
+
+});
+
+}
+
+function deleteUser(id){
+
+fetch("/users/"+id,{
+method:"DELETE"
+})
+.then(()=>loadUsers());
+
+}
+
+function logout(){
+
+window.location.href="/adminlogin.html";
+
+}
+
+loadUsers();
+
+</script>
+
+</body>
+</html>

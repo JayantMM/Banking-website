@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Secure Bank</title>
+
+<style>
+body {
+    margin:0;
+    font-family: Arial;
+    background: linear-gradient(135deg,#1e3c72,#2a5298);
+}
+
+.container {
+    width: 350px;
+    margin: 80px auto;
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+}
+
+.tabs {
+    display:flex;
+}
+
+.tabs button {
+    flex:1;
+    padding:10px;
+    border:none;
+    cursor:pointer;
+}
+
+.active {
+    background:#2a5298;
+    color:white;
+}
+
+input {
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+}
+
+button.submit {
+    width:100%;
+    padding:10px;
+    background:#2a5298;
+    color:white;
+    border:none;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="tabs">
+<button id="loginTab" class="active" onclick="switchTab('login')">Login</button>
+<button id="registerTab" onclick="switchTab('register')">Register</button>
+<button id="forgotTab" onclick="switchTab('forgot')">Forgot</button>
+</div>
+
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+
+<button class="submit" onclick="submitForm()">Continue</button>
+
+</div>
+
+<script>
+const BASE="http://127.0.0.1:3000";
+let mode="login";
+
+function switchTab(tab){
+    mode=tab;
+
+    document.getElementById("loginTab").classList.remove("active");
+    document.getElementById("registerTab").classList.remove("active");
+    document.getElementById("forgotTab").classList.remove("active");
+
+    document.getElementById(tab+"Tab").classList.add("active");
+}
+
+async function submitForm(){
+    const username=document.getElementById("username").value;
+    const password=document.getElementById("password").value;
+
+    let url="";
+    let body={};
+
+    if(mode==="login"){
+        url="/login";
+        body={username,password};
+    }
+    else if(mode==="register"){
+        url="/register";
+        body={username,password};
+    }
+    else{
+        url="/forgot";
+        body={username,newPassword:password};
+    }
+
+    const res=await fetch(BASE+url,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(body)
+    });
+
+    const msg=await res.text();
+    alert(msg);
+
+    if(res.ok && mode==="login"){
+        window.location="dashboard.html";
+    }
+}
+</script>
+
+</body>
+</html>

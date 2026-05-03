@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Smart Bank Dashboard</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #eaf4fb;
+    }
+
+    h1 {
+      color: #3498db;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 60%;
+      background: white;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border: 1px solid #ccc;
+    }
+
+    th {
+      background: #3498db;
+      color: white;
+    }
+
+    .logout-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: red;
+      color: white;
+      padding: 10px;
+      border: none;
+      cursor: pointer;
+    }
+
+    input {
+      padding: 5px;
+      margin: 5px;
+    }
+
+    button {
+      padding: 6px 10px;
+      background: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- PROTECT PAGE -->
+<script>
+if (!localStorage.getItem("loggedIn")) {
+  window.location.href = "login.html";
+}
+</script>
+
+<h1>🏦 Smart Banking App</h1>
+
+<button class="logout-btn" onclick="logout()">Logout</button>
+
+<h2>Users</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Balance</th>
+    </tr>
+  </thead>
+  <tbody id="userTable"></tbody>
+</table>
+
+<h2>Send Money</h2>
+
+From ID: <input id="fromId">
+To ID: <input id="toId">
+Amount: <input id="amount">
+<button onclick="sendMoney()">Send</button>
+
+<script>
+
+// Load users
+function loadUsers() {
+  fetch("http://localhost:3000/users")
+    .then(res => res.json())
+    .then(data => {
+      let rows = "";
+
+      data.forEach(user => {
+        rows += `
+          <tr>
+            <td>${user.id}</td>
+            <td>${user.name}</td>
+            <td>${user.balance}</td>
+          </tr>
+        `;
+      });
+
+      document.getElementById("userTable").innerHTML = rows;
+    })
+    .catch(err => console.log(err));
+}
+
+// Send money
+function sendMoney() {
+  const fromId = document.getElementById("fromId").value;
+  const toId = document.getElementById("toId").value;
+  const amount = parseInt(document.getElementById("amount").value);
+
+  fetch("http://localhost:3000/transfer", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ fromId, toId, amount })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert("Transfer Successful ✅");
+      loadUsers();
+    } else {
+      alert(data.message);
+    }
+  });
+}
+
+// Auto refresh
+setInterval(loadUsers, 2000);
+
+// First load
+loadUsers();
+
+</script>
+
+<script src="logout.js"></script>
+
+</body>
+</html>

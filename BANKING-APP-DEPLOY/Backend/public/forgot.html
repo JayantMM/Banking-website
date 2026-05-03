@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Forgot Password</title>
+
+<style>
+body{
+font-family:Arial;
+background:#dfe8f3;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+}
+
+.box{
+width:400px;
+background:white;
+padding:30px;
+border-radius:10px;
+box-shadow:0 0 10px gray;
+text-align:center;
+z-index:10;
+position:relative;
+}
+
+input{
+width:90%;
+padding:12px;
+margin:10px 0;
+font-size:16px;
+border:1px solid #ccc;
+border-radius:6px;
+outline:none;
+}
+
+button{
+width:95%;
+padding:12px;
+background:#2d6cdf;
+color:white;
+border:none;
+font-size:18px;
+cursor:pointer;
+border-radius:6px;
+}
+
+button:hover{
+background:#1f5ac0;
+}
+
+#msg{
+margin-top:20px;
+font-size:22px;
+font-weight:bold;
+word-break:break-word;
+}
+
+a{
+display:block;
+margin-top:20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h1>Forgot Password</h1>
+
+<input type="email" id="email" placeholder="Enter Email">
+
+<button type="button" onclick="findPassword()">Reset Password</button>
+
+<div id="msg"></div>
+
+<a href="login.html">Back to Login</a>
+
+</div>
+
+<script>
+function findPassword(){
+
+let email = document.getElementById("email").value.trim();
+let msg = document.getElementById("msg");
+
+if(email === ""){
+msg.innerHTML = "Enter Email";
+msg.style.color = "red";
+return;
+}
+
+fetch("/forgot-password",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body: JSON.stringify({email:email})
+})
+.then(function(res){
+return res.json();
+})
+.then(function(data){
+
+if(data.success){
+msg.innerHTML = "Your Password: " + data.password;
+msg.style.color = "green";
+}else{
+msg.innerHTML = data.message || "Email Not Found";
+msg.style.color = "red";
+}
+
+})
+.catch(function(){
+msg.innerHTML = "Server Error";
+msg.style.color = "red";
+});
+
+}
+</script>
+
+</body>
+</html>
