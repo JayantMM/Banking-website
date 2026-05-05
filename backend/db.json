@@ -1,0 +1,28 @@
+{
+  "users": [
+    {
+      "id": 1777698620560,
+      "name": "Amogh",
+      "email": "amogh@gmail.com",
+      "username": "Amogh",
+      "password": "1234",
+      "gender": "Male",
+      "card": "1234567890123456",
+      "pin": "1234",
+      "balance": 0,
+      "history": []
+    }
+  ],
+  "transactions": [
+    {
+      "sender": "jay",
+      "receiver": "jay",
+      "amount": 123,
+      "date": "2026-04-09T09:15:45.556Z"
+    }
+  ],
+  "admin": {
+    "username": "admin",
+    "password": "admin123"
+  }
+}

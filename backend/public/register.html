@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Register</title>
+
+<style>
+body{
+font-family:Arial;
+text-align:center;
+margin:0;
+
+/* ✅ Only Background Fixed */
+background:url("Bank.jpg");
+background-size:cover;
+background-position:center;
+background-repeat:no-repeat;
+background-attachment:fixed;
+}
+
+.box{
+width:420px;
+margin:35px auto;
+background:rgba(255,255,255,0.95);
+padding:30px;
+border-radius:10px;
+}
+
+input,select{
+width:90%;
+padding:12px;
+margin:8px;
+font-size:16px;
+border:1px solid #ccc;
+border-radius:6px;
+box-sizing:border-box;
+}
+
+button{
+width:95%;
+padding:12px;
+background:green;
+color:white;
+border:none;
+font-size:18px;
+cursor:pointer;
+border-radius:6px;
+}
+
+#msg{
+margin-top:12px;
+font-weight:bold;
+word-break:break-word;
+line-height:1.7;
+}
+
+a{
+text-decoration:none;
+color:#1f6feb;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>New User Register</h2>
+
+<input type="text" id="name" placeholder="Full Name">
+
+<input type="text" id="email" placeholder="Email">
+
+<input type="text" id="username" placeholder="Username">
+
+<input type="password" id="password" placeholder="Password">
+
+<select id="gender">
+<option value="">Select Gender</option>
+<option value="Male">Male</option>
+<option value="Female">Female</option>
+<option value="Other">Other</option>
+</select>
+
+<input type="password" id="pin" placeholder="Set 4 Digit PIN">
+
+<button onclick="registerUser()">Register</button>
+
+<p id="msg"></p>
+
+<br>
+<a href="login.html">Back to Login</a>
+
+</div>
+
+<script>
+
+function generateCard(){
+
+let card = "";
+
+for(let i=0;i<16;i++){
+card += Math.floor(Math.random()*10);
+}
+
+return card;
+
+}
+
+async function registerUser(){
+
+let data = {
+name: document.getElementById("name").value.trim(),
+email: document.getElementById("email").value.trim(),
+username: document.getElementById("username").value.trim(),
+password: document.getElementById("password").value.trim(),
+gender: document.getElementById("gender").value,
+pin: document.getElementById("pin").value.trim()
+};
+
+let msg = document.getElementById("msg");
+
+if(
+data.name === "" ||
+data.email === "" ||
+data.username === "" ||
+data.password === "" ||
+data.gender === "" ||
+data.pin === ""
+){
+msg.style.color = "orange";
+msg.innerHTML = "⚠ Fill all details";
+return;
+}
+
+if(!data.email.toLowerCase().endsWith("@gmail.com")){
+msg.style.color = "red";
+msg.innerHTML = "Email must end with @gmail.com";
+return;
+}
+
+if(!/^\d{4}$/.test(data.pin)){
+msg.style.color = "red";
+msg.innerHTML = "PIN must be 4 digits";
+return;
+}
+
+let users = JSON.parse(localStorage.getItem("users")) || [];
+
+let sameEmail = users.find(u => u.email === data.email);
+let sameUser = users.find(u => u.username === data.username);
+
+if(sameEmail){
+msg.style.color = "red";
+msg.innerHTML = "Email already registered";
+return;
+}
+
+if(sameUser){
+msg.style.color = "red";
+msg.innerHTML = "Username already exists";
+return;
+}
+
+data.card = generateCard();
+
+try{
+
+let res = await fetch("http://localhost:3000/register",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify(data)
+});
+
+let result = await res.json();
+
+if(result.success){
+
+users.push(data);
+localStorage.setItem("users", JSON.stringify(users));
+
+msg.style.color = "green";
+
+msg.innerHTML =
+"✅ Registration Successful<br><br>" +
+"<b>Your Debit Card Number:</b><br>" +
+data.card + "<br><br>" +
+"<b>Keep it Safe</b>";
+
+setTimeout(function(){
+window.location.href = "login.html";
+},3000);
+
+}else{
+
+msg.style.color = "red";
+msg.innerHTML = result.message || "Registration Failed";
+
+}
+
+}catch(error){
+
+msg.style.color = "red";
+msg.innerHTML = "Server connection failed";
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
